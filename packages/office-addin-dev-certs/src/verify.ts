@@ -6,11 +6,10 @@ import * as crypto from "crypto";
 import * as fs from "fs";
 import * as path from "path";
 import * as defaults from "./defaults";
-import { usageDataObject } from "./defaults";
 import { ExpectedError } from "office-addin-usage-data";
 
 // On win32 this is a unique hash used with PowerShell command to reliably delineate command output
-export const outputMarker = process.platform === "win32" ? `[${crypto.createHash("md5").update(`${defaults.certificateName}${defaults.caCertificatePath}`).digest("hex")}]` : "";
+export const outputMarker = process.platform === "win32" ? `[${crypto.createHash("md5").update(`${defaults.getCertificateName()}${defaults.caCertificatePath()}`).digest("hex")}]` : "";
 
 /* global process, Buffer, __dirname */
 
@@ -18,7 +17,7 @@ function getVerifyCommand(returnInvalidCertificate: boolean): string {
   switch (process.platform) {
     case "win32": {
       const script = path.resolve(__dirname, "..\\scripts\\verify.ps1");
-      const defaultCommand = `powershell -ExecutionPolicy Bypass -File "${script}" -CaCertificateName "${defaults.certificateName}" -CaCertificatePath "${defaults.caCertificatePath}" -LocalhostCertificatePath "${defaults.localhostCertificatePath}" -OutputMarker "${outputMarker}"`;
+      const defaultCommand = `powershell -ExecutionPolicy Bypass -File "${script}" -CaCertificateName "${defaults.getCertificateName()}" -CaCertificatePath "${defaults.caCertificatePath()}" -LocalhostCertificatePath "${defaults.localhostCertificatePath()}" -OutputMarker "${outputMarker}"`;
       if (returnInvalidCertificate) {
         return defaultCommand + ` -ReturnInvalidCertificate`;
       }
@@ -27,7 +26,7 @@ function getVerifyCommand(returnInvalidCertificate: boolean): string {
     case "darwin": {
       // macOS
       const script = path.resolve(__dirname, "../scripts/verify.sh");
-      return `sh '${script}' '${defaults.certificateName}'`;
+      return `sh '${script}' '${defaults.getCertificateName()}'`;
     }
     case "linux":
       const script = path.resolve(__dirname, "../scripts/verify_linux.sh");
@@ -89,8 +88,8 @@ function validateCertificateAndKey(certificatePath: string, keyPath: string) {
 }
 
 export function verifyCertificates(
-  certificatePath: string = defaults.localhostCertificatePath,
-  keyPath: string = defaults.localhostKeyPath
+  certificatePath: string = defaults.localhostCertificatePath(),
+  keyPath: string = defaults.localhostKeyPath()
 ): boolean {
   try {
     let isCertificateValid: boolean = true;
@@ -100,10 +99,8 @@ export function verifyCertificates(
       isCertificateValid = false;
     }
     let output = isCertificateValid && isCaCertificateInstalled();
-    usageDataObject.reportSuccess("verifyCertificates()");
     return output;
   } catch (err: any) {
-    usageDataObject.reportException("verifyCertificates()", err);
     throw err;
   }
 }

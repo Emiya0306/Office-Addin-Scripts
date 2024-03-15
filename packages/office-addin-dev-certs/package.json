@@ -1,7 +1,7 @@
 {
-  "name": "office-addin-dev-certs",
-  "version": "1.12.2",
-  "description": "For managing certificates when developing Office Add-ins.",
+  "name": "kyligence-dev-certs",
+  "version": "1.12.11",
+  "description": "For managing certificates when developing Kyligence Apps.",
   "main": "./lib/main.js",
   "scripts": {
     "build": "rimraf lib && concurrently \"tsc -p tsconfig.json\"",
@@ -13,24 +13,12 @@
     "test": "mocha -r ts-node/register test/**/*.ts",
     "watch": "tsc -p tsconfig.json -w"
   },
-  "author": "Office Dev",
+  "author": "Kyligence",
   "license": "MIT",
   "bin": {
-    "office-addin-dev-certs": "./cli.js"
+    "kyligence-dev-certs": "./cli.js"
   },
-  "keywords": [
-    "Office",
-    "add-in",
-    "localhost",
-    "SSL",
-    "https",
-    "certificates",
-    "keys",
-    "cert",
-    "development",
-    "secure",
-    "server"
-  ],
+  "keywords": [],
   "dependencies": {
     "commander": "^6.2.0",
     "fs-extra": "^7.0.1",
@@ -53,10 +41,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/OfficeDev/Office-Addin-Scripts"
+    "url": "https://github.com/Emiya0306/Office-Addin-Scripts"
   },
   "bugs": {
-    "url": "https://github.com/OfficeDev/Office-Addin-Scripts/issues"
+    "url": "https://github.com/Emiya0306/Office-Addin-Scripts/issues"
+  },
+  "publishConfig": {
+    "registry": "https://repo-ofs.kyligence.com/repository/npm-hosted/"
   },
   "prettier": "office-addin-prettier-config",
   "gitHead": "dffbcd4d1397534105b98fb13ba0fb1c3aba2dea"

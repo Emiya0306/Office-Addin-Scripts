@@ -6,7 +6,6 @@ import * as fsExtra from "fs-extra";
 import * as path from "path";
 import * as defaults from "./defaults";
 import { isCaCertificateInstalled } from "./verify";
-import { usageDataObject } from "./defaults";
 import { ExpectedError } from "office-addin-usage-data";
 
 /* global process, console, __dirname */
@@ -16,13 +15,13 @@ function getUninstallCommand(machine: boolean = false): string {
     case "win32": {
       const script = path.resolve(__dirname, "..\\scripts\\uninstall.ps1");
       return `powershell -ExecutionPolicy Bypass -File "${script}" ${machine ? "LocalMachine" : "CurrentUser"} "${
-        defaults.certificateName
+        defaults.getCertificateName()
       }"`;
     }
     case "darwin": {
       // macOS
       const script = path.resolve(__dirname, "../scripts/uninstall.sh");
-      return `sudo sh '${script}' '${defaults.certificateName}'`;
+      return `sudo sh '${script}' '${defaults.getCertificateName()}'`;
     }
     case "linux":
       const script = path.resolve(__dirname, "../scripts/uninstall_linux.sh");
@@ -50,12 +49,10 @@ export async function uninstallCaCertificate(machine: boolean = false, verbose: 
     const command = getUninstallCommand(machine);
 
     try {
-      console.log(`Uninstalling CA certificate "Developer CA for Microsoft Office Add-ins"...`);
+      console.log(`Uninstalling CA certificate "${defaults.getCertificateName()}"...`);
       execSync(command, { stdio: "pipe" });
       console.log(`You no longer have trusted access to https://localhost.`);
-      usageDataObject.reportSuccess("uninstallCaCertificate()");
     } catch (error: any) {
-      usageDataObject.reportException("uninstallCaCertificate()", error);
       throw new Error(`Unable to uninstall the CA certificate.\n${error.stderr.toString()}`);
     }
   } else {

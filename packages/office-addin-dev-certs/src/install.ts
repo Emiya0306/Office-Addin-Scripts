@@ -7,7 +7,6 @@ import * as defaults from "./defaults";
 import { generateCertificates } from "./generate";
 import { deleteCertificateFiles, uninstallCaCertificate } from "./uninstall";
 import { isCaCertificateInstalled, verifyCertificates } from "./verify";
-import { usageDataObject } from "./defaults";
 import { ExpectedError } from "office-addin-usage-data";
 
 /* global process, console, __dirname */
@@ -42,42 +41,39 @@ export async function ensureCertificatesAreInstalled(
 
     if (areCertificatesValid) {
       console.log(
-        `You already have trusted access to https://localhost.\nCertificate: ${defaults.localhostCertificatePath}\nKey: ${defaults.localhostKeyPath}`
+        `You already have trusted access to https://localhost.\nCertificate: ${defaults.localhostCertificatePath()}\nKey: ${defaults.localhostKeyPath()}`
       );
     } else {
       await uninstallCaCertificate(false, false);
       deleteCertificateFiles(defaults.certificateDirectory);
       await generateCertificates(
-        defaults.caCertificatePath,
-        defaults.localhostCertificatePath,
-        defaults.localhostKeyPath,
+        defaults.caCertificatePath(),
+        defaults.localhostCertificatePath(),
+        defaults.localhostKeyPath(),
         daysUntilCertificateExpires,
         domains
       );
-      await installCaCertificate(defaults.caCertificatePath, machine);
+      await installCaCertificate(defaults.caCertificatePath(), machine);
     }
-
-    usageDataObject.reportSuccess("ensureCertificatesAreInstalled()");
   } catch (err: any) {
-    usageDataObject.reportException("ensureCertificatesAreInstalled()", err);
     throw err;
   }
 }
 
 export async function installCaCertificate(
-  caCertificatePath: string = defaults.caCertificatePath,
+  caCertificatePath: string = defaults.caCertificatePath(),
   machine: boolean = false
 ) {
   const command = getInstallCommand(caCertificatePath, machine);
 
   try {
-    console.log(`Installing CA certificate "Developer CA for Microsoft Office Add-ins"...`);
+    console.log(`Installing CA certificate "${defaults.getCertificateName()}"...`);
     // If the certificate is already installed by another instance skip it.
     if (!isCaCertificateInstalled()) {
       execSync(command, { stdio: "pipe" });
     }
     console.log(
-      `You now have trusted access to https://localhost.\nCertificate: ${defaults.localhostCertificatePath}\nKey: ${defaults.localhostKeyPath}`
+      `You now have trusted access to https://localhost.\nCertificate: ${defaults.localhostCertificatePath()}\nKey: ${defaults.localhostKeyPath()}`
     );
   } catch (error: any) {
     throw new Error(`Unable to install the CA certificate. ${error.stderr.toString()}`);

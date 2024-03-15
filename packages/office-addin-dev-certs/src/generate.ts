@@ -14,9 +14,9 @@ import * as defaults from "./defaults";
    else, new certificates are generated and installed if --install was provided.
 */
 export async function generateCertificates(
-  caCertificatePath: string = defaults.caCertificatePath,
-  localhostCertificatePath: string = defaults.localhostCertificatePath,
-  localhostKeyPath: string = defaults.localhostKeyPath,
+  caCertificatePath: string = defaults.caCertificatePath(),
+  localhostCertificatePath: string = defaults.localhostCertificatePath(),
+  localhostKeyPath: string = defaults.localhostKeyPath(),
   daysUntilCertificateExpires: number = defaults.daysUntilCertificateExpires,
   domains: string[] = defaults.domain
 ) {
@@ -31,7 +31,7 @@ export async function generateCertificates(
   const cACertificateInfo: mkcert.CACertificateInfo = {
     countryCode: defaults.countryCode,
     locality: defaults.locality,
-    organization: defaults.certificateName,
+    organization: defaults.getCertificateName(),
     state: defaults.state,
     validityDays: daysUntilCertificateExpires,
   };
@@ -65,7 +65,7 @@ export async function generateCertificates(
     throw new Error(`Unable to write generated certificates.\n${err}`);
   }
 
-  if (caCertificatePath === defaults.caCertificatePath) {
+  if (caCertificatePath === defaults.caCertificatePath()) {
     console.log("The developer certificates have been generated in " + defaults.certificateDirectory);
   } else {
     console.log("The developer certificates have been generated.");
